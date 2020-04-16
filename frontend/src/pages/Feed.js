@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 
+import io from 'socket.io-client';
+
 import './Feed.css'
 
 import more from '../assets/more.svg'
@@ -10,6 +12,7 @@ import send from '../assets/send.svg'
 
 function Feed() {
     const [feed, setFeed] = useState([]);
+    const socket = io('http://localhost:3333');
 
     useEffect(() => {
         async function getPosts() {
@@ -17,9 +20,30 @@ function Feed() {
             setFeed(response.data)
         }
         getPosts();
-    }, [])
 
-    async function handleLike(id){
+    }, [feed]);
+
+    useEffect(()=>{
+        function registerToSocket() {
+            socket.on('post', newPost => {
+                setFeed([newPost, ...feed]);
+            })
+    
+            socket.on('like', likedPost => {
+                setFeed(feed.map(post =>
+                    likedPost._id === post._id ? likedPost : post
+                ))
+            })
+        }
+        registerToSocket();
+    
+        return () => {
+            socket.off("post");
+            socket.off("like");
+          };
+    }, [socket, feed])
+   
+    async function handleLike(id) {
         await api.post(`posts/${id}/like`)
     }
 
@@ -39,7 +63,7 @@ function Feed() {
                     <img src={`http://localhost:3333/files/${post.image}`} alt="" />
                     <footer>
                         <div className="actions">
-                            <button type="button" onClick={()=>handleLike(post._id)}>
+                            <button type="button" onClick={() => handleLike(post._id)}>
                                 <img src={like} alt="" />
                             </button>
 
@@ -49,7 +73,7 @@ function Feed() {
 
                         </div>
 
-                        <strong>{post.likes} cutidas</strong>
+                        <strong>{post.likes} curtidas</strong>
                         <p> {post.description}
                             <span>{post.hashtags}</span>
                         </p>
@@ -62,3 +86,10 @@ function Feed() {
 }
 
 export default Feed;
+
+
+
+
+
+
+

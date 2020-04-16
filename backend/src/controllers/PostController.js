@@ -38,7 +38,7 @@ module.exports = {
         // .toFile(
         //     path.resolve(req.file.destination, 'resized', image)
         // )
-        
+
         const post = await Post.create({
             author, 
             place, 
@@ -46,6 +46,8 @@ module.exports = {
             hashtags,
             image
         });
+
+        req.io.emit('post', post);
 
         return res.json(post);
     }

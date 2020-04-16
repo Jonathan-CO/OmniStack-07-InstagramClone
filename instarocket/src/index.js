@@ -1,14 +1,8 @@
 import React from 'react';
-import {
-  View,  Text
-} from 'react-native';
+import Routes from './routes'
 
-function App(){
+export default function App(){
   return (
-    <View>
-      <Text>Hello Omnistack 07</Text>
-    </ View>
+    <Routes />
   );
 };
-
-export default App;

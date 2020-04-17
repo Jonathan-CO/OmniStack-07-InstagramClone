@@ -33,7 +33,13 @@ export default function Routes() {
                         )
                         // headerRight: <Image source={camera}/>
                     })} />
-                <Stack.Screen name="New" component={New} />
+                <Stack.Screen 
+                    name="New" 
+                    component={New} 
+                    options={()=>({
+                        headerTitle: "Nova Publicação"
+                    })}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     )

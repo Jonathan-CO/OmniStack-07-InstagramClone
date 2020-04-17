@@ -1,22 +1,80 @@
 import React, { useState } from 'react';
-
+import api from '../services/api';
+import ImagePicker from 'react-native-image-picker';
 import { View, StyleSheet, TouchableOpacity, Text, TextInput, Image } from 'react-native';
 
 
-export default function New() {
+export default function New({navigation}) {
+    const [preview, setPreview] = useState(null);
     const [image, setImage] = useState(null);
     const [author, setAuthor] = useState('');
     const [place, setPlace] = useState('');
     const [description, setDescription] = useState('');
     const [hashtags, setHashtags] = useState('');
 
+    function handleSelectImage(){
+        ImagePicker.showImagePicker({
+            title: 'Selecionar Imagem',
+        }, upload => {
+            if(upload.didCancel){
+                console.log("Cancelado pelo Usuário")
+            }
+            if(upload.error){
+                console.log("Ocorreu um erro")
+            }
+            else {
+                const  preview = {
+                    uri: `data:image/jpeg;base64,${upload.data}`
+                }
+
+                let prefix;
+                let  ext;
+
+                if(upload.fileName){
+                    [prefix, ext] = upload.fileName.split('.');
+                    ext = ext.toLowerCase() === 'heic' ? jpg : ext;
+    
+                }else{
+                    prefix = new Date().getTime();
+                    ext = 'jpg'
+                }
+
+               
+                const image = {
+                    uri: upload.uri,
+                    type: upload.type,
+                    name: `${prefix}.${ext}`
+                }
+                setPreview(preview);
+                setImage(image);
+            }
+        })
+    }
+
+    async function handleSubmit(){
+        const data = new FormData();
+
+        data.append('image', image);
+        data.append('author', author);
+        data.append('place', place);
+        data.append('description', description);
+        data.append('hashtags', hashtags);
+
+        await api.post('/posts', data);
+        navigation.navigate('Feed')
+    }
+
     return (
         <View style={styles.container}>
             <TouchableOpacity
-                style={styles.selectButton}
-                onPress={() => { }}>
+                style={ styles.selectButton}
+                onPress={handleSelectImage }>
                 <Text style={styles.selectButtonText}>Selecionar Imagem</Text>
             </TouchableOpacity>
+
+            { preview && 
+                <Image style={styles.preview} source={preview}/>
+            }
 
             <TextInput
                 style={styles.input}
@@ -60,7 +118,7 @@ export default function New() {
 
             <TouchableOpacity
                 style={styles.shareButton}
-                onPress={() => { }}>
+                onPress={handleSubmit}>
                 <Text style={styles.shareButtonText}>Compartilhar</Text>
             </TouchableOpacity>
         </View>

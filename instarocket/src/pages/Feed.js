@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 import api from '../services/api';
 import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
 import more from '../assets/more.png'
@@ -9,6 +10,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 export default function Feed() {
 
     const [feed, setFeed] = useState([]);
+    const socket = io('http://10.0.3.2:3333');
+
 
     useEffect(() => {
         async function getPosts() {
@@ -19,6 +22,29 @@ export default function Feed() {
 
     }, []);
 
+    useEffect(()=>{
+        function registerToSocket() {
+            socket.on('post', newPost => {
+                setFeed([newPost, ...feed]);
+            })
+    
+            socket.on('like', likedPost => {
+                setFeed(feed.map(post =>
+                    likedPost._id === post._id ? likedPost : post
+                ))
+            })
+        }
+        registerToSocket();
+    
+        return () => {
+            socket.off("post");
+            socket.off("like");
+          };
+    }, [socket, feed])
+
+    async function handleLike(id) {
+        await api.post(`posts/${id}/like`)
+    }
 
     return (
         <View style={styles.container}>
@@ -42,7 +68,7 @@ export default function Feed() {
                         <View style={styles.feedItemFooter}>
 
                             <View style={styles.actions}>
-                                <TouchableOpacity style={styles.action} onPress={() => { }}>
+                                <TouchableOpacity style={styles.action} onPress={() => handleLike(item._id)}>
                                     <Image source={like}/>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.action} onPress={() => { }}>

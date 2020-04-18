@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import api from '../services/api';
+import FormData, {getHeaders} from 'form-data';
 import ImagePicker from 'react-native-image-picker';
 import { View, StyleSheet, TouchableOpacity, Text, TextInput, Image } from 'react-native';
 
 
-export default function New({navigation}) {
+export default function New({ navigation }) {
     const [preview, setPreview] = useState(null);
     const [image, setImage] = useState(null);
     const [author, setAuthor] = useState('');
@@ -12,68 +13,84 @@ export default function New({navigation}) {
     const [description, setDescription] = useState('');
     const [hashtags, setHashtags] = useState('');
 
-    function handleSelectImage(){
+    function handleSelectImage() {
         ImagePicker.showImagePicker({
             title: 'Selecionar Imagem',
         }, upload => {
-            if(upload.didCancel){
+            if (upload.didCancel) {
                 console.log("Cancelado pelo Usuário")
             }
-            if(upload.error){
+            if (upload.error) {
                 console.log("Ocorreu um erro")
             }
             else {
-                const  preview = {
+                const preview = {
                     uri: `data:image/jpeg;base64,${upload.data}`
                 }
 
-                let prefix;
-                let  ext;
+                // let prefix;
+                // let ext;
 
-                if(upload.fileName){
-                    [prefix, ext] = upload.fileName.split('.');
-                    ext = ext.toLowerCase() === 'heic' ? jpg : ext;
-    
-                }else{
-                    prefix = new Date().getTime();
-                    ext = 'jpg'
-                }
+                // if (upload.fileName) {
+                //     [prefix, ext] = upload.fileName.split('.');
+                //     ext = ext.toLowerCase() === 'heic' ? 'jpg' : ext;
 
-               
+                // } else {
+                //     prefix = new Date().getTime();
+                //     ext = 'jpg'
+                // }
+
                 const image = {
-                    uri: upload.uri,
+                    uri: upload.uri,//.replace('content://', ''),
                     type: upload.type,
-                    name: `${prefix}.${ext}`
+                    name: upload.fileName,//`${prefix}.${ext}`
+                    // size: upload.fileSize
                 }
                 setPreview(preview);
                 setImage(image);
+                // setImage(image);
             }
         })
     }
 
-    async function handleSubmit(){
-        const data = new FormData();
+    async function handleSubmit() {
 
-        data.append('image', image);
-        data.append('author', author);
-        data.append('place', place);
-        data.append('description', description);
-        data.append('hashtags', hashtags);
+        const post = new FormData();
+        post.append('image', image);
+        post.append('author', author);
+        post.append('place', place);
+        post.append('description', description);
+        post.append('hashtags', hashtags);
 
-        await api.post('/posts', data);
-        navigation.navigate('Feed')
+        // let formHeaders = post.getHeaders();
+
+        api.interceptors.request.use((config)=>{
+            config.headers = {'content-type': `multipart/form-data`}
+            console.log(config.data['_parts']);
+            return config
+        })
+
+    
+        await api.post(
+            '/posts',
+            post,
+        )
+        .then(response=>console.log(response))
+        .catch(error => console.log(error));
+
+        // navigation.navigate('Feed')
     }
 
     return (
         <View style={styles.container}>
             <TouchableOpacity
-                style={ styles.selectButton}
-                onPress={handleSelectImage }>
+                style={styles.selectButton}
+                onPress={handleSelectImage}>
                 <Text style={styles.selectButtonText}>Selecionar Imagem</Text>
             </TouchableOpacity>
 
-            { preview && 
-                <Image style={styles.preview} source={preview}/>
+            {preview &&
+                <Image style={styles.preview} source={preview} />
             }
 
             <TextInput
@@ -127,57 +144,57 @@ export default function New({navigation}) {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      paddingHorizontal: 20,
-      paddingTop: 30,
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingTop: 30,
     },
-  
+
     selectButton: {
-      borderRadius: 4,
-      borderWidth: 1,
-      borderColor: '#CCC',
-      borderStyle: 'dashed',
-      height: 42,
-  
-      justifyContent: 'center',
-      alignItems: 'center',
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#CCC',
+        borderStyle: 'dashed',
+        height: 42,
+
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-  
+
     selectButtonText: {
-      fontSize: 16,
-      color: '#666',
+        fontSize: 16,
+        color: '#666',
     },
-  
+
     preview: {
-      width: 100,
-      height: 100,
-      marginTop: 10,
-      alignSelf: 'center',
-      borderRadius: 4,
+        width: 100,
+        height: 100,
+        marginTop: 10,
+        alignSelf: 'center',
+        borderRadius: 4,
     },
-  
+
     input: {
-      borderRadius: 4,
-      borderWidth: 1,
-      borderColor: '#ddd',
-      padding: 15,
-      marginTop: 10,
-      fontSize: 16,
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        padding: 15,
+        marginTop: 10,
+        fontSize: 16,
     },
-  
+
     shareButton: {
-      backgroundColor: '#7159c1',
-      borderRadius: 4,
-      height: 42,
-      marginTop: 15,
-  
-      justifyContent: 'center',
-      alignItems: 'center',
+        backgroundColor: '#7159c1',
+        borderRadius: 4,
+        height: 42,
+        marginTop: 15,
+
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-  
+
     shareButtonText: {
-      fontWeight: 'bold',
-      fontSize: 16,
-      color: '#FFF',
+        fontWeight: 'bold',
+        fontSize: 16,
+        color: '#FFF',
     },
-  });
+});

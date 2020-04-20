@@ -17,6 +17,11 @@ This app features all the latest tools and practices in mobile development!
 - <img src="https://cdn2.iconfinder.com/data/icons/nodejs-1/512/nodejs-512.png" width="20" height="20"/> **Multer** — A library for handling multipart/form-data, how images and docs
 - <img src="https://cdn2.iconfinder.com/data/icons/nodejs-1/512/nodejs-512.png" width="20" height="20"/> **Jimp** — A library for image manipulation
 
+
+### Services
+In this appication you can post images and give likes. The posted photos are resized on the backend, so that their largest side has 500px. Each post and like made are updated in real time on all devices running the application.
+
+
 ## Notes: 
 <br />
 
@@ -24,8 +29,8 @@ Week 7 was developed with previous versions of many tools used. Thus, this proje
 <br/>
 
 ### Main Differences:
-Change from using class to using Hooks
-Change of route structure in the Mobile App, using React Navigation 5
-Change from using Sharp to using Jimp.
+Change from using class to using Hooks <br />
+Change of route structure in the Mobile App, using React Navigation 5<br />
+Change from using Sharp to using Jimp.<br />
 Image upload made with RNFetchBlob 
 

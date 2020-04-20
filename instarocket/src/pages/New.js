@@ -80,7 +80,10 @@ export default function New({ navigation }) {
             'Content-Type': 'application/octet-stream',
         }, [
             {name: 'image', filename:image.fileName, type:image.type, data: RNFetchBlob.wrap(image.uri)},
-            //{ name: 'author', data: author },
+            { name: 'author', data: author },
+            { name: 'place', data: place },
+            { name: 'description', data: description },
+            { name: 'hashtags', data: hashtags },
         ])
         .then(response => {console.log(response)})
         .catch(error => console.log(error))

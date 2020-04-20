@@ -135,7 +135,8 @@ const styles = StyleSheet.create({
     },
 
     actions:{
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginLeft: 10
     },
 
     action: {

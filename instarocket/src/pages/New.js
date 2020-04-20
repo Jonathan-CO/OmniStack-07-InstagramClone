@@ -1,18 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 // import FormData, {getHeaders} from 'form-data';
 import RNFetchBlob from 'rn-fetch-blob';
 import ImagePicker from 'react-native-image-picker';
-import { View, StyleSheet, TouchableOpacity, Text, TextInput, Image } from 'react-native';
+import { Keyboard, ScrollView, View, StyleSheet, TouchableOpacity, Text, TextInput, Image, KeyboardAvoidingView } from 'react-native';
 
 
 export default function New({ navigation }) {
+
+    const [tecladoShow, setTecladoShow] = useState(false);
+    const [tecladoHeigth, setTecladoHeigth] = useState(245);
+
     const [preview, setPreview] = useState(null);
     const [image, setImage] = useState(null);
+    const [image2, setImage2] = useState(null);
     const [author, setAuthor] = useState('');
     const [place, setPlace] = useState('');
     const [description, setDescription] = useState('');
     const [hashtags, setHashtags] = useState('');
+
+    // Escuta events Keyboard (show e hide)
+    useEffect(() => {
+        let showListen = Keyboard.addListener(
+            'keyboardDidShow',
+            (e) => {
+                const { height } = e.endCoordinates
+                setTecladoHeigth(height)
+                setTecladoShow(true)
+            })
+
+        let hideListen = Keyboard.addListener(
+            'keyboardDidHide',
+            () => {
+                setTecladoShow(false)
+            })
+        return (() => {
+            showListen.remove();
+            hideListen.remove();
+        })
+    }, [])
 
     function handleSelectImage() {
         ImagePicker.showImagePicker({
@@ -43,114 +69,101 @@ export default function New({ navigation }) {
 
                 // const image = {
                 //     fileName: upload.fileName,//`${prefix}.${ext}`
-                //     uri: upload.uri,//.replace('content://', ''),
+                //     uri: upload.uri,
                 //     type: upload.type,
                 // }
 
-                const image = upload
                 setPreview(preview);
-                setImage(image);
+                setImage(upload);
+
             }
         })
     }
 
     async function handleSubmit() {
 
-        // const post = new FormData();
-        // post.append('image', image);
-        // post.append('author', author);
-        // post.append('place', place);
-        // post.append('description', description);
-        // post.append('hashtags', hashtags);
-
-        
-        // api.interceptors.request.use((config)=>{
-        //     config.headers = {'content-type': `multipart/form-data`}
-        //     return config
-        // })
-
-        // await api.post('/posts', post )
-        // .then(response=>console.log(response))
-        // .catch(error => console.log(error));
-
         RNFetchBlob.fetch('POST', 'http://192.168.0.106:3333/posts', {
-            // 'Content-Type': 'multipart/form-data',
             Authorization: "bearer access-token",
-            otherHeader: 'foo',
             'Content-Type': 'application/octet-stream',
         }, [
-            {name: 'image', filename:image.fileName, type:image.type, data: RNFetchBlob.wrap(image.uri)},
+            { name: 'image', filename: image.fileName, type: image.type, data: RNFetchBlob.wrap(image.uri) },
             { name: 'author', data: author },
             { name: 'place', data: place },
             { name: 'description', data: description },
             { name: 'hashtags', data: hashtags },
         ])
-        .then(response => {console.log(response)})
-        .catch(error => console.log(error))
-
-
+            .then(response => { console.log(response) })
+            .catch(error => console.log(error))
 
         navigation.navigate('Feed')
     }
 
     return (
-        <View style={styles.container}>
-            <TouchableOpacity
-                style={styles.selectButton}
-                onPress={handleSelectImage}>
-                <Text style={styles.selectButtonText}>Selecionar Imagem</Text>
-            </TouchableOpacity>
+        <ScrollView style={styles.container}>
+            <KeyboardAvoidingView behavior="padding">
 
-            {preview &&
-                <Image style={styles.preview} source={preview} />
-            }
+                    <View style={{flex:1, justifyContent:'flex-end'}}>
 
-            <TextInput
-                style={styles.input}
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder="Nome do autor"
-                placeholderTextColor="#999"
-                value={author}
-                onChangeText={author => setAuthor(author)}
-            />
 
-            <TextInput
-                style={styles.input}
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder="Local da foto"
-                placeholderTextColor="#999"
-                value={place}
-                onChangeText={place => setPlace(place)}
-            />
+                        <TouchableOpacity
+                            style={styles.selectButton}
+                            onPress={handleSelectImage}>
+                            <Text style={styles.selectButtonText}>Selecionar Imagem</Text>
+                        </TouchableOpacity>
 
-            <TextInput
-                style={styles.input}
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder="Descrição"
-                placeholderTextColor="#999"
-                value={description}
-                onChangeText={description => setDescription(description)}
-            />
+                        {preview &&
+                            <Image style={styles.preview} source={preview} />
+                        }
 
-            <TextInput
-                style={styles.input}
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder="Hashtags"
-                placeholderTextColor="#999"
-                value={hashtags}
-                onChangeText={hashtags => setHashtags(hashtags)}
-            />
+                        <TextInput
+                            style={styles.input}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="Nome do autor"
+                            placeholderTextColor="#999"
+                            value={author}
+                            onChangeText={author => setAuthor(author)}
+                        />
 
-            <TouchableOpacity
-                style={styles.shareButton}
-                onPress={handleSubmit}>
-                <Text style={styles.shareButtonText}>Compartilhar</Text>
-            </TouchableOpacity>
-        </View>
+                        <TextInput
+                            style={styles.input}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="Local da foto"
+                            placeholderTextColor="#999"
+                            value={place}
+                            onChangeText={place => setPlace(place)}
+                        />
+
+                        <TextInput
+                            style={styles.input}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="Descrição"
+                            placeholderTextColor="#999"
+                            value={description}
+                            onChangeText={description => setDescription(description)}
+                        />
+
+                        <TextInput
+                            style={styles.input}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="Hashtags"
+                            placeholderTextColor="#999"
+                            value={hashtags}
+                            onChangeText={hashtags => setHashtags(hashtags)}
+                        />
+
+                        <TouchableOpacity
+                            style={styles.shareButton}
+                            onPress={handleSubmit}>
+                            <Text style={styles.shareButtonText}>Compartilhar</Text>
+                        </TouchableOpacity>
+                    </View>
+            </KeyboardAvoidingView>
+
+        </ScrollView>
     )
 }
 

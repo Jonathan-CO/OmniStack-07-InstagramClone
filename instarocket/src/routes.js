@@ -13,7 +13,6 @@ export default function Routes() {
     return (
         <NavigationContainer>
             <Stack.Navigator 
-            // initialRouteName="New"
             screenOptions={{
                 headerTitle: <Image source={logo} />,
                 headerTintColor: '#000',
@@ -33,7 +32,6 @@ export default function Routes() {
                                 <Image source={camera} />
                             </TouchableOpacity>
                         )
-                        // headerRight: <Image source={camera}/>
                     })} />
                 <Stack.Screen 
                     name="New" 

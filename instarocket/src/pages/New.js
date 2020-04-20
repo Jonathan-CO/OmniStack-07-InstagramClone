@@ -1,54 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import api from '../services/api';
-// import FormData, {getHeaders} from 'form-data';
+import React, { useState } from 'react';
 import RNFetchBlob from 'rn-fetch-blob';
 import ImagePicker from 'react-native-image-picker';
-import { Keyboard, ScrollView, View, StyleSheet, TouchableOpacity, Text, TextInput, Image, KeyboardAvoidingView } from 'react-native';
-
+import {ScrollView, View, StyleSheet, TouchableOpacity, Text, TextInput, Image, KeyboardAvoidingView } from 'react-native';
 
 export default function New({ navigation }) {
 
-    const [tecladoShow, setTecladoShow] = useState(false);
-    const [tecladoHeigth, setTecladoHeigth] = useState(245);
-
     const [preview, setPreview] = useState(null);
     const [image, setImage] = useState(null);
-    const [image2, setImage2] = useState(null);
     const [author, setAuthor] = useState('');
     const [place, setPlace] = useState('');
     const [description, setDescription] = useState('');
     const [hashtags, setHashtags] = useState('');
-
-    // Escuta events Keyboard (show e hide)
-    useEffect(() => {
-        let showListen = Keyboard.addListener(
-            'keyboardDidShow',
-            (e) => {
-                const { height } = e.endCoordinates
-                setTecladoHeigth(height)
-                setTecladoShow(true)
-            })
-
-        let hideListen = Keyboard.addListener(
-            'keyboardDidHide',
-            () => {
-                setTecladoShow(false)
-            })
-        return (() => {
-            showListen.remove();
-            hideListen.remove();
-        })
-    }, [])
 
     function handleSelectImage() {
         ImagePicker.showImagePicker({
             title: 'Selecionar Imagem',
         }, upload => {
             if (upload.didCancel) {
-                console.log("Cancelado pelo Usuário")
+                return;
+                // console.log("Cancelado pelo Usuário")
             }
             if (upload.error) {
-                console.log("Ocorreu um erro")
+                return
+                // console.log("Ocorreu um erro")
             }
             else {
                 const preview = {
@@ -75,7 +49,6 @@ export default function New({ navigation }) {
 
                 setPreview(preview);
                 setImage(upload);
-
             }
         })
     }
@@ -92,8 +65,8 @@ export default function New({ navigation }) {
             { name: 'description', data: description },
             { name: 'hashtags', data: hashtags },
         ])
-            .then(response => { console.log(response) })
-            .catch(error => console.log(error))
+            // .then(response => { console.log(response) })
+            .catch(error => alert("Houve um erro ao realizar o post"))
 
         navigation.navigate('Feed')
     }
@@ -103,8 +76,6 @@ export default function New({ navigation }) {
             <KeyboardAvoidingView behavior="padding">
 
                     <View style={{flex:1, justifyContent:'flex-end'}}>
-
-
                         <TouchableOpacity
                             style={styles.selectButton}
                             onPress={handleSelectImage}>

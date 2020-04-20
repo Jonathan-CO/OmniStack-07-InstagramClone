@@ -21,7 +21,7 @@ function Feed() {
         }
         getPosts();
 
-    }, [feed]);
+    }, []);
 
     useEffect(()=>{
         function registerToSocket() {

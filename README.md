@@ -26,5 +26,6 @@ Week 7 was developed with previous versions of many tools used. Thus, this proje
 ### Main Differences:
 Change from using class to using Hooks
 Change of route structure in the Mobile App, using React Navigation 5
-Change from using Sharp to using Jimp. 
+Change from using Sharp to using Jimp.
+Image upload made with RNFetchBlob 
 

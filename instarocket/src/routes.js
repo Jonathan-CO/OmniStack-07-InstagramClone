@@ -12,7 +12,9 @@ const Stack = createStackNavigator();
 export default function Routes() {
     return (
         <NavigationContainer>
-            <Stack.Navigator screenOptions={{
+            <Stack.Navigator 
+            // initialRouteName="New"
+            screenOptions={{
                 headerTitle: <Image source={logo} />,
                 headerTintColor: '#000',
                 //headerStyle:{height:80, padding:15, backgroundColor:'red'},

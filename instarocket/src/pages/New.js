@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../services/api';
-import FormData, {getHeaders} from 'form-data';
+// import FormData, {getHeaders} from 'form-data';
+import RNFetchBlob from 'rn-fetch-blob';
 import ImagePicker from 'react-native-image-picker';
 import { View, StyleSheet, TouchableOpacity, Text, TextInput, Image } from 'react-native';
 
@@ -40,45 +41,53 @@ export default function New({ navigation }) {
                 //     ext = 'jpg'
                 // }
 
-                const image = {
-                    uri: upload.uri,//.replace('content://', ''),
-                    type: upload.type,
-                    name: upload.fileName,//`${prefix}.${ext}`
-                    // size: upload.fileSize
-                }
+                // const image = {
+                //     fileName: upload.fileName,//`${prefix}.${ext}`
+                //     uri: upload.uri,//.replace('content://', ''),
+                //     type: upload.type,
+                // }
+
+                const image = upload
                 setPreview(preview);
                 setImage(image);
-                // setImage(image);
             }
         })
     }
 
     async function handleSubmit() {
 
-        const post = new FormData();
-        post.append('image', image);
-        post.append('author', author);
-        post.append('place', place);
-        post.append('description', description);
-        post.append('hashtags', hashtags);
+        // const post = new FormData();
+        // post.append('image', image);
+        // post.append('author', author);
+        // post.append('place', place);
+        // post.append('description', description);
+        // post.append('hashtags', hashtags);
 
-        // let formHeaders = post.getHeaders();
+        
+        // api.interceptors.request.use((config)=>{
+        //     config.headers = {'content-type': `multipart/form-data`}
+        //     return config
+        // })
 
-        api.interceptors.request.use((config)=>{
-            config.headers = {'content-type': `multipart/form-data`}
-            console.log(config.data['_parts']);
-            return config
-        })
+        // await api.post('/posts', post )
+        // .then(response=>console.log(response))
+        // .catch(error => console.log(error));
 
-    
-        await api.post(
-            '/posts',
-            post,
-        )
-        .then(response=>console.log(response))
-        .catch(error => console.log(error));
+        RNFetchBlob.fetch('POST', 'http://192.168.0.106:3333/posts', {
+            // 'Content-Type': 'multipart/form-data',
+            Authorization: "bearer access-token",
+            otherHeader: 'foo',
+            'Content-Type': 'application/octet-stream',
+        }, [
+            {name: 'image', filename:image.fileName, type:image.type, data: RNFetchBlob.wrap(image.uri)},
+            //{ name: 'author', data: author },
+        ])
+        .then(response => {console.log(response)})
+        .catch(error => console.log(error))
 
-        // navigation.navigate('Feed')
+
+
+        navigation.navigate('Feed')
     }
 
     return (

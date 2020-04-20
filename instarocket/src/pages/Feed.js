@@ -10,7 +10,9 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 export default function Feed() {
 
     const [feed, setFeed] = useState([]);
-    const socket = io('http://10.0.3.2:3333');
+    // const socket = io('http://10.0.3.2:3333');
+    const socket = io('http://192.168.0.106:3333');
+    // const socket = io('https://rocketbox-jco.herokuapp.com');
 
 
     useEffect(() => {
@@ -63,7 +65,9 @@ export default function Feed() {
                             <Image source={more} />
                         </View>
 
-                        <Image source={{ uri: `http://10.0.3.2:3333/files/${item.image}` }} style={styles.feedImage} />
+                        {/* <Image source={{ uri: `http://10.0.3.2:3333/files/${item.image}` }} style={styles.feedImage} /> */}
+                        <Image source={{ uri: `http://192.168.0.106:3333/files/${item.image}` }} style={styles.feedImage} />
+                        {/* <Image source={{ uri: `https://rocketbox-jco.herokuapp.com/files/${item.image}` }} style={styles.feedImage} /> */}
 
                         <View style={styles.feedItemFooter}>
 
